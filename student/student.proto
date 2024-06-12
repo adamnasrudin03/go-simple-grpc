@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package student;
+
+option go_package = "github.com/adamnasrudin03/go-simpel-grpc/student";
+
+service StudentService {
+    rpc GetStudentByEmail(Student) returns (Student) {}
+}
+
+message Student {
+    int32 id = 1;
+    string name = 2;
+    int32 age = 3;
+    string email = 4;
+}
