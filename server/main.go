@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/mail"
 	"os"
 	"sync"
 
@@ -23,10 +24,21 @@ type dataStudentServer struct {
 	students []*pb.Student
 }
 
+func IsValidEmail(email string) bool {
+	_, err := mail.ParseAddress(email)
+	return err == nil
+}
+
 func (s *dataStudentServer) GetStudentByEmail(ctx context.Context, in *pb.Student) (*pb.Student, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+
 	log.Printf("[GetStudentByEmail] incoming request : %v", in.Email)
+
+	if !IsValidEmail(in.Email) {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid email format")
+	}
+
 	for _, v := range s.students {
 		if v.Email == in.Email {
 			return v, nil
@@ -82,7 +94,7 @@ func serverInterceptor(ctx context.Context, req interface{}, info *grpc.UnarySer
 	resp, err := handler(ctx, req)
 	if err != nil {
 		log.Printf("[grpc-handler] Invalid request: %v err: %v \n", info.FullMethod, err)
-		return nil, status.Errorf(codes.NotFound, err.Error())
+		return nil, err
 	}
 
 	log.Printf("[grpc-handler] Success request: %v \n", info.FullMethod)
