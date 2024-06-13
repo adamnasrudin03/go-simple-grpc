@@ -32,7 +32,7 @@ func (s *dataStudentServer) GetStudentByEmail(ctx context.Context, in *pb.Studen
 			return v, nil
 		}
 	}
-	return nil, nil
+	return nil, status.Errorf(codes.NotFound, "Data student not found")
 }
 func (s *dataStudentServer) loadData() {
 	data, err := os.ReadFile("data/students.json")
