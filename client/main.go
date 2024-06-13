@@ -21,8 +21,8 @@ func getDataStudentByEmail(ctx context.Context, client pb.StudentServiceClient, 
 		Email: email,
 	})
 	if err != nil {
-		log.Fatalf("Failed to get student: %v", err)
-
+		log.Printf("Failed to get student: (%v)", err)
+		return
 	}
 	log.Printf("Received: %v", student)
 }
@@ -48,7 +48,14 @@ func main() {
 	md := metadata.Pairs("api-key", config.ApiKey)
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
-	getDataStudentByEmail(ctx, client, "adam@email.com")
-	time.Sleep(3 * time.Second)
-	getDataStudentByEmail(ctx, client, "nasrudin@email.com")
+	// Get data student by email
+	fmt.Println("To exit press CTRL+C")
+	for {
+		email := ""
+		fmt.Print("Enter email: ")
+		fmt.Scanln(&email)
+
+		getDataStudentByEmail(ctx, client, email)
+		time.Sleep(1 * time.Second)
+	}
 }
